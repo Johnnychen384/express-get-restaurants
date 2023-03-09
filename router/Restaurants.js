@@ -18,9 +18,18 @@ router.get("/", async (req, res) => {
     res.json(restArr)
 })
 
-router.post("/", async (req, res) => {
+router.post("/", [check("name").not().isEmpty().trim(), check("location").isLength({min:10, max: 30}).trim(), check("cuisine").not().isEmpty().trim()], async (req, res) => {
+    const errors = validationResult(req) // 
+
+    console.log('if there are errors',errors)
+    if(!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array()})
+    }
+    
+    
     const createdRest = await Restaurant.create(req.body)
-    res.json(createdRest)
+    const restArr = await Restaurant.findAll()
+    res.json(restArr)
 })
 
 router.put("/:id", async (req, res) => {
